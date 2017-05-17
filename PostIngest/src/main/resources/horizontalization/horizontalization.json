@@ -1,0 +1,45 @@
+{
+  "id": "horizontalization",
+  "description": "sinfo create horizontal tables",
+  "labels": {
+  },
+  "run": {
+    "cpus": 4,
+    "mem": 8096,
+    "disk": 8096,
+    "docker": {
+      "image": "registry.paas.datio.com:5000/datiobd/spark-secure-job"
+    },
+    "env": {
+      "SEC_ENABLED": "true",
+      "SPARK_JOB_JAR_URL": "http://sinfo-nfs.c.datio-sinfo.internal/sinfo/jars/MasterProcessing-1.0.jar",
+      "SPARK_JOB_CONF_URL": "http://sinfo-nfs.c.datio-sinfo.internal/sinfo/conf/horizontalization.conf",
+      "SPARK_JOB_OPTIONS": "\"--conf spark.cores.max=4 --conf spark.executor.memory=1g --conf spark.mesos.executor.docker.image=registry.paas.datio.com:5000/datiobd/spark-secure-job --class com.datiobd.spider.horizontalization.Generator\"",
+      "SPARK_USER": "root",
+      "SPARK_PRINCIPAL": "sparkUser1",
+      "SPARK_KEYTAB": "/root/sparkUser1.keytab",
+      "LD_LIBRARY_PATH": "/opt/mesosphere/lib",
+      "HADOOP_CONF_URL": "http://sinfo-nfs.c.datio-sinfo.internal/hdfs-r0-proy.tar.gz",
+      "HADOOP_CONF_DIR": "/etc/hadoop",
+      "VHOSTS": "gosec2.c.datio-sinfo.internal",
+      "VAULT_PORT": "8200",
+      "VAULT_TOKEN": "0a06148b-2fa8-4e76-8173-14e673c9672f",
+      "VAULT_PATH": "/userland/spark/sinfo/sparkUser1",
+      "KDC_HOST": "ldap1.c.datio-sinfo.internal",
+      "KADMIN_HOST": "ldap1.c.datio-sinfo.internal",
+      "REALM": "ES.DEV.BBVA.COM"
+    },
+    "volumes": [
+      {
+        "containerPath": "/opt/mesosphere/lib/",
+        "hostPath": "/opt/mesosphere/lib/",
+        "mode": "RO"
+      },
+      {
+        "containerPath": "/opt/mesosphere/packages/",
+        "hostPath": "/opt/mesosphere/packages/",
+        "mode": "RO"
+      }
+    ]
+  }
+}

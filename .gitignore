@@ -1,0 +1,16 @@
+target/
+.idea/
+.idea/*
+*.iml
+*.log
+*.log.?
+*.log.??
+*.log.???
+.project
+.classpath
+.settings/
+.cache-*
+assets
+dependency-reduced-pom.xml
+out
+logs
