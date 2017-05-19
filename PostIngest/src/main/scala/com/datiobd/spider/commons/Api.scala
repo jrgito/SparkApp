@@ -4,7 +4,6 @@ import java.sql.Date
 import java.util.Calendar
 
 import org.apache.spark.sql.{DataFrame, DataFrameWriter, SQLContext}
-
 import scala.collection.Map
 
 abstract class Api extends FileOps with SinfoLogger {
@@ -21,35 +20,6 @@ abstract class Api extends FileOps with SinfoLogger {
   val mode = "overwrite"
   val SINGLE_QUOTE = "'"
 
-
-  /**
-    * read file with optios from path with sqlContext
-    *
-    * @param sqlContext {SQLContext}
-    * @param path       {String}
-    * @param format     {String}
-    * @param options    {Map[String, String]}
-    * @return {DataFrame}
-    */
-  def readDF(sqlContext: SQLContext, path: String, format: String, options: Option[Map[String, String]],
-             partitions: Option[Seq[(String, Any)]] = None): DataFrame = {
-    val readerOptions = Utils.toMap(options.getOrElse(Map[String, String]()).getOrElse("readerOptions", Map[String, String]()))
-    val df = format match {
-      case "json" | "parquet" => sqlContext.read.format(format)
-      case "avro" =>
-        val defaults = Map[String, String]()
-        sqlContext.read.format(AVRO_FORMAT).options(defaults ++ readerOptions)
-      case "csv" =>
-        val defaults: Map[String, String] = Map(headers, inferSchema)
-        sqlContext.read.format(CSV_FORMAT).options(defaults ++ readerOptions)
-      case _ => sqlContext.read
-    }
-    if (partitions.isEmpty) {
-      df.load(path)
-    } else {
-      df.load(path).where(partitions.get.map(p => s"${p._1}=${transformPartitionValue(p._2)}").mkString(" and "))
-    }
-  }
 
   /**
     * read table with sqlContext
@@ -128,21 +98,6 @@ abstract class Api extends FileOps with SinfoLogger {
     df
   }
 
-  /**
-    * read file with options from path with sqlContext and register it with name
-    *
-    * @param sqlContext {SQLContext}
-    * @param alias      {String}
-    * @param path       {String}
-    * @param format     {String}
-    * @param options    {Map[String, String]}
-    * @return {DataFrame}
-    */
-  def readAndRegisterDF(sqlContext: SQLContext, alias: String, path: String, format: String, options: Option[Map[String, String]] = None): DataFrame = {
-    val df = readDF(sqlContext, path, format, options)
-    df.registerTempTable(alias)
-    df
-  }
 
   /**
     * register df as name tempTable
@@ -186,27 +141,7 @@ abstract class Api extends FileOps with SinfoLogger {
 
   }
 
-  /**
-    * write df with table properties
-    *
-    * @param df    {DataFrame}
-    * @param table {Table}
-    */
-  @deprecated
-  def writePartition(df: DataFrame, table: Table, partition: String): Unit = {
-    writeDF(df, table.path + table.name + partition, table.format, table.writeMode, table.properties, Seq())
-  }
 
-  /**
-    *
-    * @param df             {DataFrame}
-    * @param table          {Table}
-    * @param partitionKey   {String}
-    * @param partitionValue {String}
-    */
-  def writePartition(df: DataFrame, table: Table, partitionKey: String, partitionValue: Any): Unit = {
-    writeDF(df, table.path + table.name + createPartition(partitionKey, partitionValue), table.format, table.writeMode, table.properties, Seq())
-  }
 
 
   /**
@@ -237,114 +172,12 @@ abstract class Api extends FileOps with SinfoLogger {
     moveDirectory(table.path + tempDirectoryPath + table.name, table.path + table.name + partitionPath)
   }
 
-  /**
-    * writeDF
-    *
-    * @param df      {DataFrame}
-    * @param path    {String}
-    * @param format  {String}
-    * @param mode    {String}
-    * @param options {Map[String, String]}
-    */
-  def writeDF(df: DataFrame, path: String, format: String, mode: String, options: Option[Map[String, String]] = None): Unit = {
-    writeDF(df, path, format, mode, options, Seq[String]())
-  }
-
-  /**
-    *
-    * @param df               {DataFrame}
-    * @param path             {String}
-    * @param format           {String}
-    * @param mode             {String}
-    * @param partitionColumns {Seq[String]}
-    */
-  def writeDF(df: DataFrame, path: String, format: String, mode: String, partitionColumns: Seq[String]): Unit = {
-    writeDF(df, path, format, mode, None, partitionColumns)
-  }
-
-  /**
-    * delete a table directory
-    *
-    * @param table {Table} table to delete
-    */
-  def deleteTable(table: Table): Unit = {
-    deleteDirectory(table.path + table.name)
-  }
-
-  /**
-    *
-    * delete a tables directory
-    *
-    * @param table          {Table} table to delete
-    * @param partitionKey   {String} partition key
-    * @param partitionValue {String} partition value
-    */
-  def deletePartition(table: Table, partitionKey: String, partitionValue: Any): Unit = {
-    deleteDeepPartition(table, Seq((partitionKey, partitionValue)))
-  }
 
 
-  def deleteDeepPartition(table: Table, partitions: Seq[(String, Any)]): Unit = {
-    deleteDirectory(table.path + table.name + createDeepPartition(partitions))
-  }
 
-  /**
-    * write df with options
-    *
-    * @param df               {DataFrame}
-    * @param path             {String}
-    * @param format           {String}
-    * @param mode             {String}
-    * @param options          {Map[String, String]}
-    * @param partitionColumns {Seq[String]}
-    */
-  def writeDF(df: DataFrame, path: String, format: String, mode: String, options: Option[Map[String, String]], partitionColumns: Seq[String]): Unit = {
-    val writerOptions = Utils.toMap(options.getOrElse(Map[String, String]()).getOrElse("writerOptions", Map[String, String]()))
-    val dfw: DataFrameWriter = (format match {
-      case "parquet" | "json" => df.write.format(format)
-      case "avro" =>
-        val defaults = Map[String, String]()
-        df.write.format(AVRO_FORMAT).options(defaults ++ writerOptions)
-      case "csv" =>
-        val defaults = Map("header" -> "true")
-        df.write.format(CSV_FORMAT).options(defaults ++ writerOptions)
-      case _ => df.write.format(format)
-    }).mode(mode)
-    if (partitionColumns.isEmpty) {
-      dfw.save(path)
-    } else {
-      dfw.partitionBy(partitionColumns: _*).save(path)
-    }
-  }
 
-  /**
-    * creates a good partition
-    *
-    * @param key  {String} partition key
-    * @param data {String} partition value
-    * @return
-    */
-  def createPartition(key: String, data: Any): String = data match {
-    case _: java.sql.Date => s"/$key=$data"
-    case _: java.util.Date => s"/$key=${new Date(data.asInstanceOf[java.util.Date].getTime)}"
-    case _: Calendar => s"/$key=${new Date(data.asInstanceOf[Calendar].getTimeInMillis)}"
-    case _ => s"/$key=$data"
-  }
 
-  def createDeepPartition(partitions: Seq[(String, Any)]): String = partitions.map(p => createPartition(p._1, p._2)).mkString
 
-  /**
-    * transform data for where clause
-    *
-    * @param data {Any} any value
-    * @return {Any}
-    */
-  def transformPartitionValue(data: Any): Any = data match {
-    case _: java.sql.Date => SINGLE_QUOTE + data + SINGLE_QUOTE
-    case _: java.util.Date => SINGLE_QUOTE + new Date(data.asInstanceOf[java.util.Date].getTime) + SINGLE_QUOTE
-    case _: Calendar => SINGLE_QUOTE + new Date(data.asInstanceOf[Calendar].getTimeInMillis) + SINGLE_QUOTE
-    case _ => data
-  }
 
   /**
     * show table if is in debug mode

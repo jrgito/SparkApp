@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
 
-abstract class SinfoApp(conf: Config) extends Api with SinfoLogger with Serializable with TimeUtils with SQLUtils with Constants {
+abstract class SparkApp(conf: Config) extends Api with SinfoLogger with Serializable with TimeUtils with SQLUtils with Constants {
 
   def this(configFile: String) {
     this(ConfigFactory.parseFile(new File(configFile)).resolve())

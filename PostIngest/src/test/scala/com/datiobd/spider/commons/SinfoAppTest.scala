@@ -7,7 +7,7 @@ import org.scalatest.FunSpec
 
 class SinfoAppTest extends FunSpec {
 
-  class _SinfoAppMock(configFile: String) extends SinfoApp(configFile) {
+  class _SinfoAppMock(configFile: String) extends SparkApp(configFile) {
     override def execute(): Unit = {}
   }
 
