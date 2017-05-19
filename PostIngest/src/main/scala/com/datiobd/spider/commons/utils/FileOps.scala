@@ -1,4 +1,4 @@
-package com.datiobd.spider.commons
+package com.datiobd.spider.commons.utils
 
 import java.io.File
 

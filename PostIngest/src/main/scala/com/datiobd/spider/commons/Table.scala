@@ -6,15 +6,7 @@ import org.apache.spark.sql.types.StructType
 import scala.collection.JavaConverters._
 
 
-case class Table(name: String,
-                 path: String,
-                 format: String = "parquet",
-                 writeMode: String = "overwrite",
-                 pks: Seq[String],
-                 partitions: Boolean,
-                 partitionColumns: Seq[String],
-                 properties: Option[Map[String, String]] = None,
-                 var schema: Option[StructType]=None)
+
 
 object TableBuilder extends Constants {
 

@@ -1,6 +1,7 @@
-package com.datiobd.spider.commons.dataFrameOps
+package com.datiobd.spider.commons.crudOps.dataframeOps
 
 import com.datiobd.spider.commons.Utils
+import com.datiobd.spider.commons.crudOps.Commons
 import org.apache.spark.sql.{DataFrame, SQLContext}
 
 import scala.collection.Map
@@ -9,7 +10,7 @@ import scala.collection.Map
   * Created by JRGv89 on 19/05/2017.
   */
 
-  protected trait ReadOps extends Commons{
+trait DataframeReader extends Commons{
 
   /**
     * read file with optios from path with sqlContext
