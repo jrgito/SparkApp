@@ -1,6 +1,6 @@
 package com.datiobd.spider.commons.utils
 
-import com.datiobd.spider.commons.exceptions.SchemaException
+import com.datiobd.spider.commons.exceptions.{SchemaErrors, SchemaException}
 import org.apache.spark.sql.types.StructType
 
 /**
@@ -8,9 +8,6 @@ import org.apache.spark.sql.types.StructType
   */
 object CheckDataFrame {
 
-  private val columnsNumberError = "Columns numbers are distinct: right (%d) != left (%d)"
-  private val columnsNameError = "field %s not found in right schema %s"
-  private val columnsTypesError = "field %s has different type left: %s != right: %s"
 
   /**
     * check if two struct type are equals (length, names, types)
@@ -35,7 +32,8 @@ object CheckDataFrame {
 
   private def hasDifferentNumberColumns(leftSchema: StructType, rightSchema: StructType): Boolean = {
     if (!(leftSchema.length == rightSchema.length)) {
-      throw new SchemaException(columnsNumberError.format(leftSchema.length, rightSchema.length))
+      throw new SchemaException(SchemaErrors.columnsNumberError.code,
+        SchemaErrors.columnsNumberError.message.format(leftSchema.length, rightSchema.length))
     }
     true
   }
@@ -51,7 +49,8 @@ object CheckDataFrame {
   private def hasDifferentColumnsName(leftSchema: StructType, rightSchema: StructType): Boolean = {
     leftSchema.fields.foreach(fieldSchema =>
       if (!rightSchema.map(_.name).contains(fieldSchema.name)) {
-        throw new SchemaException(columnsNameError.format(fieldSchema.name, rightSchema.map(_.name).toSeq))
+        throw new SchemaException(SchemaErrors.columnsNameError.code,
+          SchemaErrors.columnsNameError.message.format(fieldSchema.name, rightSchema.map(_.name).toSeq))
       })
     true
   }
@@ -66,7 +65,8 @@ object CheckDataFrame {
   private def hasDifferentDataTypes(leftSchema: StructType, rightSchema: StructType): Boolean = {
     leftSchema.fields.foreach(fieldSchema =>
       if (!(rightSchema.find(_.name == fieldSchema.name).head.dataType == fieldSchema.dataType)) {
-        throw new SchemaException(columnsTypesError.format(fieldSchema.name, fieldSchema.dataType, rightSchema.find(_.name == fieldSchema.name).head.dataType))
+        throw new SchemaException(SchemaErrors.columnsTypesError.code,
+          SchemaErrors.columnsTypesError.message.format(fieldSchema.name, fieldSchema.dataType, rightSchema.find(_.name == fieldSchema.name).head.dataType))
       })
     true
   }

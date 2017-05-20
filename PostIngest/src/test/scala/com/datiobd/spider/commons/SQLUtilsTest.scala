@@ -1,5 +1,6 @@
 package com.datiobd.spider.commons
 
+import com.datiobd.spider.commons.table.Table
 import org.scalatest.FunSpec
 
 /**
@@ -12,9 +13,9 @@ class SQLUtilsTest extends FunSpec {
   val s1 = Seq("c1", "c2", "c3")
   val s2 = Seq("c1", "c3")
   val s3 = Seq("c1", "c3", "c2")
-  val t1 = Table("table1", "", "", "", s1, partitions = false, Seq(), None)
-  val t2 = Table("table2", "", "", "", s2, partitions = false, Seq(), None)
-  val t3 = Table("table3", "", "", "", s3, partitions = false, Seq(), None)
+  val t1 = new Table("table1", "", "", "", s1, partitions = false, Seq(), None)
+  val t2 = new  Table("table2", "", "", "", s2, partitions = false, Seq(), None)
+  val t3 = new Table("table3", "", "", "", s3, partitions = false, Seq(), None)
 
   describe("SQLUtilsTest") {
     describe("createJoinClause") {

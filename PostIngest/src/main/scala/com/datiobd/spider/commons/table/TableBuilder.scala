@@ -1,6 +1,6 @@
 package com.datiobd.spider.commons.table
 
-import com.datiobd.spider.commons.exceptions.MandatoryKeyNotFound
+import com.datiobd.spider.commons.exceptions.{MandatoryKeyNotFound, MandatoryKeyNotFoundErrors}
 import com.datiobd.spider.commons.utils.Utils
 import com.typesafe.config.Config
 
@@ -9,43 +9,44 @@ import scala.collection.JavaConverters._
 /**
   * Created by JRGv89 on 19/05/2017.
   */
-private class TableBuilder(defaults: Map[String, AnyRef]) {
-  val NAME = "name"
-  val PATH = "path"
-  val FORMAT = "format"
-  val MODE = "MODE"
-  val PKS = "pks"
-  val PARTITION_COLUMNS = "partitionColumns"
-  val INCLUDE_PARTITIONS_AS_PK = "includePartitionsAsPk"
-  val SORT_PKS = "sortPks"
-  val PROPERTIES = "properties"
+class TableBuilder(defaults: Map[String, AnyRef]) {
+  private val NAME = "name"
+  private val PATH = "path"
+  private val FORMAT = "format"
+  private val MODE = "mode"
+  private val PKS = "pks"
+  private val PARTITION_COLUMNS = "partitionColumns"
+  private val INCLUDE_PARTITIONS_AS_PK = "includePartitionsAsPk"
+  private val SORT_PKS = "sortPks"
+  private val PROPERTIES = "properties"
   //  {
   //    readerOptions: {}
   //    writerOptions: {}
   //  }
-  val keys = Seq(PATH, FORMAT, MODE, PKS, PARTITION_COLUMNS, INCLUDE_PARTITIONS_AS_PK, SORT_PKS, PROPERTIES)
+  private val keys = Seq(PATH, FORMAT, MODE, PKS, PARTITION_COLUMNS, INCLUDE_PARTITIONS_AS_PK, SORT_PKS, PROPERTIES)
 
   def this(config: Config) = {
     this(config.root.unwrapped.asScala.toMap)
     checkDefaults()
   }
 
-  def checkDefaults(): Unit = {
+  private def checkDefaults(): Unit = {
     keys.foreach(key => {
-      if (!defaults.contains(key)) throw new MandatoryKeyNotFound(s"key $key not found in default table config")
+      if (!defaults.contains(key)) throw new MandatoryKeyNotFound(MandatoryKeyNotFoundErrors.mandatoryKeyNotFoundError.code,
+        MandatoryKeyNotFoundErrors.mandatoryKeyNotFoundError.message.format(key))
     })
   }
 
-  def createTables(configs: Seq[Config]): Map[String, Table] = {
+  def tables(configs: Seq[Config]): Map[String, Table] = {
     configs.map(x => {
-      (x.getString(NAME), createTable(x.root.unwrapped.asScala.toMap, defaults))
+      (x.getString(NAME), table(x.root.unwrapped.asScala.toMap, defaults))
     }).toMap
   }
 
-  def createTable(merged: Map[String, Any]): Table = {
+  def table(merged: Map[String, Any]): Table = {
     val partitionsColumns = Utils.toSeq[String](merged(PARTITION_COLUMNS))
     val includePartitions = merged.getOrElse(INCLUDE_PARTITIONS_AS_PK, false)
-    val sortPks = merged.getOrElse(sortPks, false)
+    val sortPks = merged.getOrElse(SORT_PKS, false)
 
     val pks: Seq[String] = (includePartitions, sortPks) match {
       case (false, false) => Utils.toSeq[String](merged(PKS))
@@ -64,24 +65,24 @@ private class TableBuilder(defaults: Map[String, AnyRef]) {
       Some(Utils.toMap[String](merged(PROPERTIES))))
   }
 
-  def createTable(t: Map[String, Any], defaults: Map[String, Any]): Table = {
-    createTable(defaults ++ t)
+  def table(t: Map[String, Any], defaults: Map[String, Any]): Table = {
+    table(defaults ++ t)
   }
 
 }
 
 object TableBuilder {
-  private var defaults: Option[TableBuilder] = None
+  private var builder: Option[TableBuilder] = None
 
-  def instance(): TableBuilder = defaults.get
+  def create: TableBuilder = builder.get
 
-  private[SparkApp] def instance(config: Config): TableBuilder = {
-    if (defaults.isEmpty) defaults = Some(new TableBuilder(config))
-    defaults.get
+  private[commons] def instance(config: Config): TableBuilder = {
+    if (builder.isEmpty) builder = Some(new TableBuilder(config))
+    builder.get
   }
 
-  private[SparkApp] def instance(defaults: Map[String, AnyRef]): TableBuilder = {
-    if (this.defaults.isEmpty) this.defaults = Some(new TableBuilder(defaults))
-    this.defaults.get
+  private[commons] def instance(defaults: Map[String, AnyRef]): TableBuilder = {
+    if (this.builder.isEmpty) this.builder = Some(new TableBuilder(defaults))
+    this.builder.get
   }
 }

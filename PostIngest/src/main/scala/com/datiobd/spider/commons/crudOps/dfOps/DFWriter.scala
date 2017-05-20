@@ -1,4 +1,4 @@
-package com.datiobd.spider.commons.crudOps.dataframeOps
+package com.datiobd.spider.commons.crudOps.dfOps
 
 import com.datiobd.spider.commons.crudOps.Commons
 import com.datiobd.spider.commons.utils.Utils
@@ -9,7 +9,7 @@ import scala.collection.Map
 /**
   * Created by JRGv89 on 19/05/2017.
   */
-trait DataframeWriter extends Commons {
+trait DFWriter extends Commons {
 
   /**
     * writeDF

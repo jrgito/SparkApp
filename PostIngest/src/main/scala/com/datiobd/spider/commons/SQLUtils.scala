@@ -1,5 +1,7 @@
 package com.datiobd.spider.commons
 
+import com.datiobd.spider.commons.table.Table
+
 trait SQLUtils {
   private val AND = " and "
   private val SEPARATOR = ", "
@@ -211,6 +213,7 @@ trait SQLUtils {
 
   /**
     * create a select clause with a operation for each column util for group By by Clause
+ *
     * @param operation      {String} operation to apply in column
     * @param columns        {Seq[String]} columns to select
     * @return
@@ -220,6 +223,7 @@ trait SQLUtils {
   }
   /**
     * create a select clause with a operation for each column util for group By by Clause
+ *
     * @param df             {String} dataframe
     * @param operation      {String} operation to apply in column
     * @param columns        {Seq[String]} columns to select
@@ -231,6 +235,7 @@ trait SQLUtils {
 
   /**
     * create a select clause with a operation for each column util for group By by Clause
+ *
     * @param table          {Table} table
     * @param operation      {String} operation to apply in column
     * @return

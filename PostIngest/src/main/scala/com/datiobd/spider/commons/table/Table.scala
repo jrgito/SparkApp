@@ -1,5 +1,6 @@
 package com.datiobd.spider.commons.table
 
+import com.datiobd.spider.commons.SparkAppConfig
 import com.datiobd.spider.commons.crudOps.tableOps.TableOps
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{DataFrame, SQLContext}
@@ -25,9 +26,7 @@ class Table(val name: String,
 
   def update(df: DataFrame): Unit = updateTable(df, this)
 
-  def delete(): Unit = {
-    //TODO
-  }
+  def delete(): Unit = deleteTable(this)
 
   def readPartition(sqlContext: SQLContext, partitionKey: String, partitionValue: Any): DataFrame =
     readPartition(sqlContext, this, partitionKey: String, partitionValue: Any)
@@ -43,18 +42,20 @@ class Table(val name: String,
 
   def updateDeepPartition(df: DataFrame, partitions: Seq[(String, Any)]): Unit = updateDeepPartition(df, this, partitions)
 
-  def deletePartition(sqlContext: SQLContext, df: DataFrame): Unit = {
-    //TODO
-  }
+  def deletePartition(partitionKey: String, partitionValue: Any): Unit = deletePartition(this, partitionKey, partitionValue)
+
+  def deleteDeepPartition(partitions: Seq[(String, Any)]): Unit = deleteDeepPartition(this, partitions)
+
   def debug(sqlContext: SQLContext): Unit = {
-    if (isDebug()) {
+    if (SparkAppConfig.debug) {
       println("**************")
       println(s"* DEBUG: ${this.name}")
       println("**************")
       readTable(sqlContext, this, changeSchema = false).show
     }
   }
-  def copy() : Table = this.clone().asInstanceOf[Table]
+
+  def copy(): Table = this.clone().asInstanceOf[Table]
 
 }
 

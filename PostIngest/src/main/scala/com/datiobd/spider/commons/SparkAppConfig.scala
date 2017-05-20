@@ -8,7 +8,7 @@ import scala.collection.JavaConverters._
 /**
   * Created by JRGv89 on 20/05/2017.
   */
-object SparkAppConfig {
+private[commons] object SparkAppConfig {
   val PROPERTIES = "properties"
   val ENABLE = "enable"
   val DEBUG = "debug"
@@ -16,8 +16,10 @@ object SparkAppConfig {
   var isHdfsEnable = true
   var hdfsConfig: Configuration = new Configuration()
 
+  def isDebug: Boolean = debug
+
   //  config.getConfig(CONFIG_HDFS)
-  private[SparkApp] def parseHDFSConfig(config: Config): Unit = {
+   def parseHDFSConfig(config: Config): Unit = {
 
     if (config.hasPath(ENABLE) && config.getBoolean(ENABLE)) {
       val _hdfsConfig = new Configuration()

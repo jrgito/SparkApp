@@ -1,6 +1,6 @@
 package com.datiobd.spider.commons.crudOps
 
-import com.datiobd.spider.commons.crudOps.dataframeOps.{DataframeDeleter, DataframeReader, DataframeUpdater, DataframeWriter}
+import com.datiobd.spider.commons.crudOps.dfOps.{DFDeleter, DFReader, DFUpdater, DFWriter}
 import com.datiobd.spider.commons.crudOps.tableOps.TableOps
 
 /**

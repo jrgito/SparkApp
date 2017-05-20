@@ -1,14 +1,12 @@
 package com.datiobd.spider.commons.crudOps.tableOps
 
-import com.datiobd.spider.commons.crudOps.Commons
-import com.datiobd.spider.commons.crudOps.dataframeOps.{DataframeDeleter, DataframeUpdater}
+import com.datiobd.spider.commons.crudOps.dfOps.DFDeleter
 import com.datiobd.spider.commons.table.Table
-import com.datiobd.spider.commons.utils.FileOps
 
 /**
   * Created by JRGv89 on 19/05/2017.
   */
-protected trait TableDeleter extends DataframeDeleter {
+protected trait TableDeleter extends DFDeleter {
 
   /**
     * delete a table directory
@@ -16,7 +14,7 @@ protected trait TableDeleter extends DataframeDeleter {
     * @param table {Table} table to delete
     */
   def deleteTable(table: Table): Unit = {
-    deleteDirectory(table.path + table.name)
+    deleteDF(table.path + table.name)
   }
 
   /**
@@ -38,7 +36,6 @@ protected trait TableDeleter extends DataframeDeleter {
     * @param partitions {Seq[String, Any]} partitions of table to delete
     */
   def deleteDeepPartition(table: Table, partitions: Seq[(String, Any)]): Unit = {
-    deleteDirectory(table.path + table.name + createDeepPartition(partitions))
+    deleteDF(table.path + table.name + createDeepPartition(partitions))
   }
-
 }

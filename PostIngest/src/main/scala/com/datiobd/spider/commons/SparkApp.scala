@@ -2,7 +2,7 @@ package com.datiobd.spider.commons
 
 import java.io.File
 
-import com.datiobd.spider.commons.crudOps.dataframeOps.DataframeOps
+import com.datiobd.spider.commons.crudOps.dfOps.DFOps
 import com.datiobd.spider.commons.exceptions.CodeException
 import com.datiobd.spider.commons.table.{Table, TableBuilder}
 import com.datiobd.spider.commons.utils.Utils
@@ -12,7 +12,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.collection.JavaConverters._
 
-abstract class SparkApp(conf: Config) extends Constants with DataframeOps {
+abstract class SparkApp(conf: Config) extends Constants with DFOps {
 
   def this(configFile: String) {
     this(ConfigFactory.parseFile(new File(configFile)).resolve())
@@ -24,23 +24,22 @@ abstract class SparkApp(conf: Config) extends Constants with DataframeOps {
   protected val appConf = conf.getConfig(CONFIG_APP)
   private val app = appConf.getConfig(CONFIG_CONFIG)
   SparkAppConfig.parseHDFSConfig(app.getConfig(CONFIG_HDFS))
+  TableBuilder.instance(app.getConfig("defaultTable"))
 
 
   private val name = app.getString(NAME)
   private val scMap = app.getObject(CONFIG_SPARK).unwrapped.asScala.toMap.asInstanceOf[Map[String, String]]
   private val options = app.getObject(OPTIONS).unwrapped.asScala.toMap.asInstanceOf[Map[String, String]]
   protected val debug = options.getOrElse(DEBUG, false).toString.toBoolean
-  TableBuilder.instance(app.getConfig("defaultTable"))
-  val tables: Map[String, Table] = TableBuilder.instance()
-    .createTables(appConf.getConfigList("tables").asScala)
+  val tables: Map[String, Table] = TableBuilder.create.tables(appConf.getConfigList("tables").asScala)
   /** **
     * Spark config
     * ***/
 
-  val sConf = new SparkConf().setAppName(name).setAll(scMap)
-  val sc = new SparkContext(sConf)
+  private val sConf = new SparkConf().setAppName(name).setAll(scMap)
+  private val sc = new SparkContext(sConf)
   val sqlContext = new SQLContext(sc)
-  //   val hiveContext = new org.apache.spark.sql.hive.HiveContext(sc)
+
   /**
     * method that start the process
     */

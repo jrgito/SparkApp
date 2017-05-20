@@ -6,7 +6,7 @@ import com.datiobd.spider.commons.SparkAppConfig
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
 
-trait FileOps {
+object FileOps {
 
   def getHDFSConfig: Configuration = SparkAppConfig.hdfsConfig
 
