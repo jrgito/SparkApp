@@ -10,5 +10,5 @@ class MandatoryKeyNotFound(code: Int, message: String) extends CodeException(cod
 
 object MandatoryKeyNotFoundErrors {
   private val mandatoryKeyNotFoundCode = 600
-  val mandatoryKeyNotFoundError = Error(mandatoryKeyNotFoundCode, s"key %1 not found in default table config")
+  val mandatoryKeyNotFoundError = Error(mandatoryKeyNotFoundCode, s"key %s not found in default table config")
 }
