@@ -9,7 +9,7 @@ import scala.collection.JavaConverters._
 /**
   * Created by JRGv89 on 19/05/2017.
   */
-class TableBuilder(defaults: Map[String, AnyRef]) {
+private class TableBuilder(defaults: Map[String, AnyRef]) {
   val NAME = "name"
   val PATH = "path"
   val FORMAT = "format"
@@ -54,7 +54,7 @@ class TableBuilder(defaults: Map[String, AnyRef]) {
       case (true, true) => (Utils.toSeq[String](merged(PKS)) ++ partitionsColumns).sortBy(pk => pk)
     }
 
-    Table(merged(NAME).toString,
+    new Table(merged(NAME).toString,
       merged(PATH).toString,
       merged(FORMAT).toString,
       merged(MODE).toString,
@@ -68,4 +68,20 @@ class TableBuilder(defaults: Map[String, AnyRef]) {
     createTable(defaults ++ t)
   }
 
+}
+
+object TableBuilder {
+  private var defaults: Option[TableBuilder] = None
+
+  def instance(): TableBuilder = defaults.get
+
+  private[SparkApp] def instance(config: Config): TableBuilder = {
+    if (defaults.isEmpty) defaults = Some(new TableBuilder(config))
+    defaults.get
+  }
+
+  private[SparkApp] def instance(defaults: Map[String, AnyRef]): TableBuilder = {
+    if (this.defaults.isEmpty) this.defaults = Some(new TableBuilder(defaults))
+    this.defaults.get
+  }
 }

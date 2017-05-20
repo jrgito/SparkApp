@@ -2,6 +2,7 @@ package com.datiobd.spider.commons
 
 import java.io.File
 
+import com.datiobd.spider.commons.table.{Table, TableBuilder}
 import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.hadoop.conf.Configuration
 import org.apache.spark.sql.{DataFrame, SQLContext}
@@ -21,16 +22,17 @@ abstract class SparkApp(conf: Config) extends Api with SinfoLogger with Serializ
   override def isHDFSEnable: Boolean = hdfs
 
   override def getHDFSConfig: Configuration = hdfsConfig
-  override def getTables: Map[String,Table] = tables
+
+  override def getTables: Map[String, Table] = tables
 
   def execute(): Unit
 
   def parseHDFSConfig(config: Config): (Configuration, Boolean) = {
     val _HDFSConfig = config.getConfig(CONFIG_HDFS)
     if (_HDFSConfig.hasPath(ENABLE) && _HDFSConfig.getBoolean(ENABLE)) {
-        val _hdfsConfig = new Configuration()
-        _HDFSConfig.getObject(PROPERTIES).unwrapped.asScala.toMap.asInstanceOf[Map[String, String]].foreach(p => _hdfsConfig.set(p._1, p._2))
-        (_hdfsConfig, true)
+      val _hdfsConfig = new Configuration()
+      _HDFSConfig.getObject(PROPERTIES).unwrapped.asScala.toMap.asInstanceOf[Map[String, String]].foreach(p => _hdfsConfig.set(p._1, p._2))
+      (_hdfsConfig, true)
     } else {
       (new Configuration(), false)
     }
@@ -44,32 +46,32 @@ abstract class SparkApp(conf: Config) extends Api with SinfoLogger with Serializ
   private val (hdfsConfig, hdfs) = parseHDFSConfig(app)
   val logger = LoggerFactory.getLogger(name)
   protected val debug = options.getOrElse(DEBUG, false).toString.toBoolean
-  val defaultTable = TableBuilder.parseDefaultTable(app)
-  val tables: Map[String, Table] = TableBuilder.parseConfigTables(appConf, defaultTable)
-
+  TableBuilder.instance(app.getConfig("defaultTable"))
+  val tables: Map[String, Table] = TableBuilder.instance()
+    .createTables(appConf.getConfigList("tables").asScala)
   /** **
     * Spark config
     * ***/
 
-   val sConf = new SparkConf().setAppName(name).setAll(scMap)
-   val sc = new SparkContext(sConf)
-   val sqlContext = new SQLContext(sc)
-//   val hiveContext = new org.apache.spark.sql.hive.HiveContext(sc)
+  val sConf = new SparkConf().setAppName(name).setAll(scMap)
+  val sc = new SparkContext(sConf)
+  val sqlContext = new SQLContext(sc)
+  //   val hiveContext = new org.apache.spark.sql.hive.HiveContext(sc)
   /**
     * method that start the process
     */
-  def start(): Unit ={
-    if(debug){
+  def start(): Unit = {
+    if (debug) {
       time("time lapsed => ", execute())
       sc.stop
-    } else{
-      try{
+    } else {
+      try {
         time("time lapsed => ", execute())
-      }catch{
-        case e:Exception =>
+      } catch {
+        case e: Exception =>
           println("Exception caugth")
           println(e)
-      }finally {
+      } finally {
         sc.stop
       }
     }
