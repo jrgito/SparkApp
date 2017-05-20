@@ -220,21 +220,7 @@ trait TimeUtils {
     _c
   }
 
-  /**
-    * method that measure time in execute f
-    *
-    * @param s {String} text to show before time
-    * @param f {T} method to measure
-    * @tparam T {T} generic
-    * @return {Double} time lapsed in execute f
-    */
-  def time[T](s: String, f: => T): Double = {
-    val start = System.nanoTime
-    f
-    //TODO review this comment
-    println(s"$s time: " + ((System.nanoTime - start) * 1e-9) + " s")
-    (System.nanoTime - start) * 1e-9
-  }
+
 
   //todo: modify to enum
   val ACTUAL = -1

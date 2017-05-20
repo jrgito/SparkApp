@@ -3,6 +3,8 @@ package com.datiobd.spider.commons.crudOps
 import java.sql.Date
 import java.util.Calendar
 
+import com.datiobd.spider.commons.SparkAppConfig
+
 /**
   * Created by JRGv89 on 19/05/2017.
   */
@@ -25,8 +27,12 @@ protected trait Commons {
   val CSV_FORMAT: String = "com.databricks.spark.csv"
   val AVRO_FORMAT: String = "com.databricks.spark.avro"
 
-  def idDebug(): Boolean
 
+  val partitionPath = s"/%s=%s"
+
+  protected def isDebug: Boolean = SparkAppConfig.debug
+
+  //TODO refact
 
   /**
     * creates a good partition
@@ -36,12 +42,17 @@ protected trait Commons {
     * @return
     */
   def createPartition(key: String, data: Any): String = data match {
-    case _: java.sql.Date => s"/$key=$data"
-    case _: java.util.Date => s"/$key=${new Date(data.asInstanceOf[java.util.Date].getTime)}"
-    case _: Calendar => s"/$key=${new Date(data.asInstanceOf[Calendar].getTimeInMillis)}"
-    case _ => s"/$key=$data"
+    case _: java.sql.Date => partitionPath.format(key, data)
+    case _: java.util.Date => partitionPath.format(key, new Date(data.asInstanceOf[java.util.Date].getTime))
+    case _: Calendar => partitionPath.format(key, new Date(data.asInstanceOf[Calendar].getTimeInMillis))
+    case _ => partitionPath.format(key, data)
   }
 
+  /**
+    *
+    * @param partitions {Seq[(String, Any)]}
+    * @return
+    */
   def createDeepPartition(partitions: Seq[(String, Any)]): String = partitions.map(p => createPartition(p._1, p._2)).mkString
 
   /**

@@ -1,7 +1,7 @@
 package com.datiobd.spider.commons.crudOps.dataframeOps
 
-import com.datiobd.spider.commons.Utils
 import com.datiobd.spider.commons.crudOps.Commons
+import com.datiobd.spider.commons.utils.Utils
 import org.apache.spark.sql.{DataFrame, SQLContext}
 
 import scala.collection.Map
@@ -29,7 +29,7 @@ trait DataframeReader extends Commons{
       case AVRO =>
         val defaults = Map[String, String]()
         sqlContext.read.format(AVRO_FORMAT).options(defaults ++ readerOptions)
-      case "csv" =>
+      case CSV =>
         val defaults: Map[String, String] = Map(headers, inferSchema)
         sqlContext.read.format(CSV_FORMAT).options(defaults ++ readerOptions)
       case _ => sqlContext.read
@@ -37,6 +37,7 @@ trait DataframeReader extends Commons{
     if (partitions.isEmpty) {
       df.load(path)
     } else {
+      //TODO use foldLeft
       df.load(path).where(partitions.get.map(p => s"${p._1}=${transformPartitionValue(p._2)}").mkString(" and "))
     }
   }
@@ -52,8 +53,9 @@ trait DataframeReader extends Commons{
     * @return {DataFrame}
     */
   def readAndRegisterDF(sqlContext: SQLContext, alias: String, path: String, format: String, options: Option[Map[String, String]] = None): DataFrame = {
-    val df = readDF(sqlContext, path, format, options)
-    df.registerTempTable(alias)
+    //TEST
+    val df = readDF(sqlContext, path, format, options).as(alias)
+//    df.registerTempTable(alias)
     df
   }
 

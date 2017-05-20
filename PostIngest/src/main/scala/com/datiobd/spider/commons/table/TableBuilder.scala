@@ -1,7 +1,7 @@
 package com.datiobd.spider.commons.table
 
 import com.datiobd.spider.commons.exceptions.MandatoryKeyNotFound
-import com.datiobd.spider.commons.Utils
+import com.datiobd.spider.commons.utils.Utils
 import com.typesafe.config.Config
 
 import scala.collection.JavaConverters._

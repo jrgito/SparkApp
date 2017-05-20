@@ -2,14 +2,15 @@ package com.datiobd.spider.commons.utils
 
 import java.io.File
 
+import com.datiobd.spider.commons.SparkAppConfig
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
 
 trait FileOps {
 
-  def getHDFSConfig: Configuration
+  def getHDFSConfig: Configuration = SparkAppConfig.hdfsConfig
 
-  def isHDFSEnable: Boolean
+  def isHDFSEnable: Boolean = SparkAppConfig.isHdfsEnable
 
   /**
     * deletes hdfs dir
@@ -22,7 +23,7 @@ trait FileOps {
 
   /**
     *
-    * @param file
+    * @param file {File}
     */
   def deleteLocalDir(file: File): Unit = {
     if (file.isDirectory) {
