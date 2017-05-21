@@ -1,4 +1,4 @@
-package com.datiobd.spider.commons.crudOps.dfOps
+package com.datiobd.spider.commons.ops.dfOps
 
 /**
   * Created by JRGv89 on 19/05/2017.

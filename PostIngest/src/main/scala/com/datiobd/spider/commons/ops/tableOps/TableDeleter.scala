@@ -1,6 +1,6 @@
-package com.datiobd.spider.commons.crudOps.tableOps
+package com.datiobd.spider.commons.ops.tableOps
 
-import com.datiobd.spider.commons.crudOps.dfOps.DFDeleter
+import com.datiobd.spider.commons.ops.dfOps.DFDeleter
 import com.datiobd.spider.commons.table.Table
 
 /**

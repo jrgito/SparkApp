@@ -1,6 +1,6 @@
-package com.datiobd.spider.commons.crudOps.dfOps
+package com.datiobd.spider.commons.ops.dfOps
 
-import com.datiobd.spider.commons.crudOps.Commons
+import com.datiobd.spider.commons.ops.Commons
 import com.datiobd.spider.commons.utils.Utils
 import org.apache.spark.sql.{DataFrame, DataFrameWriter}
 

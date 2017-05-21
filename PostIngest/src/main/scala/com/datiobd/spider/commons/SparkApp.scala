@@ -2,7 +2,7 @@ package com.datiobd.spider.commons
 
 import java.io.File
 
-import com.datiobd.spider.commons.crudOps.dfOps.DFOps
+import com.datiobd.spider.commons.ops.dfOps.DFOps
 import com.datiobd.spider.commons.exceptions.CodeException
 import com.datiobd.spider.commons.table.{Table, TableBuilder}
 import com.datiobd.spider.commons.utils.Utils

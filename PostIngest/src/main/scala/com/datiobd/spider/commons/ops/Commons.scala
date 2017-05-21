@@ -1,4 +1,4 @@
-package com.datiobd.spider.commons.crudOps
+package com.datiobd.spider.commons.ops
 
 import java.sql.Date
 import java.util.Calendar

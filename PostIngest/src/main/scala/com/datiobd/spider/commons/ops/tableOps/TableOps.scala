@@ -1,4 +1,4 @@
-package com.datiobd.spider.commons.crudOps.tableOps
+package com.datiobd.spider.commons.ops.tableOps
 import org.apache.hadoop.conf.Configuration
 
 /**

@@ -1,7 +1,7 @@
 package com.datiobd.spider.commons.table
 
 import com.datiobd.spider.commons.SparkAppConfig
-import com.datiobd.spider.commons.crudOps.tableOps.TableOps
+import com.datiobd.spider.commons.ops.tableOps.TableOps
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{DataFrame, SQLContext}
 

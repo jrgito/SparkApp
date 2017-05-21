@@ -1,6 +1,6 @@
-package com.datiobd.spider.commons.crudOps.tableOps
+package com.datiobd.spider.commons.ops.tableOps
 
-import com.datiobd.spider.commons.crudOps.dfOps.DFWriter
+import com.datiobd.spider.commons.ops.dfOps.DFWriter
 import com.datiobd.spider.commons.exceptions.{PartitionNotFoundErrors, PartitionNotFoundException}
 import com.datiobd.spider.commons.table.Table
 import org.apache.spark.sql.DataFrame
