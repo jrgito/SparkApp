@@ -1,9 +1,9 @@
 package com.datiobd.spider.commons.ops.tableOps
 
-import com.datiobd.spider.commons.ops.dfOps.DFUpdater
 import com.datiobd.spider.commons.exceptions.{PartitionNotFoundErrors, PartitionNotFoundException}
+import com.datiobd.spider.commons.ops.dfOps.DFUpdater
 import com.datiobd.spider.commons.table.Table
-import com.datiobd.spider.commons.utils.{CheckDataFrame, Utils}
+import com.datiobd.spider.commons.utils.CheckDataFrame
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -29,6 +29,16 @@ trait TableUpdater extends DFUpdater with TableReader {
     updateDF(df, table.path + table.name, table.format, table.properties, table.partitionColumns)
   }
 
+  /**
+    * write df with table properties
+    *
+    * @param table {Table}
+    * @param df    {DataFrame}
+    */
+  def updateTableWithTS(df: DataFrame, table: Table, timestampColumn: String): Unit = {
+    updateTable(withTS(df, timestampColumn), table)
+  }
+
 
   /**
     * update a partition
@@ -40,6 +50,18 @@ trait TableUpdater extends DFUpdater with TableReader {
     */
   def updatePartition(df: DataFrame, table: Table, partitionKey: String, partitionValue: Any): Unit = {
     updateDeepPartition(df, table, Seq((partitionKey, partitionValue)))
+  }
+
+  /**
+    * update a partition
+    *
+    * @param df             {DataFrame}
+    * @param table          {Table}
+    * @param partitionKey   {String}
+    * @param partitionValue {String}
+    */
+  def updatePartitionWithTS(df: DataFrame, table: Table, partitionKey: String, partitionValue: Any, timestampColumn: String): Unit = {
+    updateDeepPartition(withTS(df, timestampColumn), table, Seq((partitionKey, partitionValue)))
   }
 
 
@@ -63,6 +85,16 @@ trait TableUpdater extends DFUpdater with TableReader {
     })
     val partitionPath = createDeepPartition(partitions)
     updateDF(df, table.path + table.name + partitionPath, table.format, table.properties)
+  }
+
+  /**
+    *
+    * @param df         {DataFrame}
+    * @param table      {Table}
+    * @param partitions {Seq[(String, Any)]}
+    */
+  def updateDeepPartitionWithTS(df: DataFrame, table: Table, partitions: Seq[(String, Any)], timestampColumn: String): Unit = {
+    updateDeepPartition(withTS(df, timestampColumn), table, partitions)
   }
 
 
