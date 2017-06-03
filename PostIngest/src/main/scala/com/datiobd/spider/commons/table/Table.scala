@@ -20,6 +20,12 @@ class Table(val name: String,
            ) extends TableOps {
 
 
+//  def this(config:Map[String,Any]) {
+//
+//    this()
+//  }
+
+
   def read(sqlContext: SQLContext): DataFrame = readTable(sqlContext, this)
 
   def write(df: DataFrame): Unit = writeTable(df, this)
