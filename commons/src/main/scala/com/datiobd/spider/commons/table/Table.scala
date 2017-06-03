@@ -30,7 +30,11 @@ class Table(val name: String,
 
   def write(df: DataFrame): Unit = writeTable(df, this)
 
+  def writeWithTS(df: DataFrame, timestampColumn: String): Unit = writeTableWithTS(df, this, timestampColumn)
+
   def update(df: DataFrame): Unit = updateTable(df, this)
+
+  def updateWithTS(df: DataFrame, timestampColumn: String): Unit = updateTableWithTS(df, this, timestampColumn)
 
   def delete(): Unit = deleteTable(this)
 
@@ -42,11 +46,23 @@ class Table(val name: String,
 
   def writePartition(df: DataFrame, partitionKey: String, partitionValue: Any): Unit = writePartition(df, this, partitionKey, partitionValue)
 
+  def writePartitionWithTS(df: DataFrame, partitionKey: String, partitionValue: Any, timestampColumn: String): Unit =
+    writePartitionWithTS(df, this, partitionKey, partitionValue, timestampColumn)
+
   def writeDeepPartition(df: DataFrame, partitions: Seq[(String, Any)]): Unit = writeDeepPartition(df, this, partitions)
+
+  def writeDeepPartitionWithTS(df: DataFrame, partitions: Seq[(String, Any)], timestampColumn: String): Unit =
+    writeDeepPartitionWithTS(df, this, partitions, timestampColumn)
 
   def updatePartition(df: DataFrame, partitionKey: String, partitionValue: Any): Unit = updatePartition(df, this, partitionKey, partitionValue)
 
+  def updatePartitionWithTS(df: DataFrame, partitionKey: String, partitionValue: Any, timestampColumn: String): Unit =
+    updatePartitionWithTS(df, this, partitionKey, partitionValue, timestampColumn)
+
   def updateDeepPartition(df: DataFrame, partitions: Seq[(String, Any)]): Unit = updateDeepPartition(df, this, partitions)
+
+  def updateDeepPartitionWithTS(df: DataFrame, partitions: Seq[(String, Any)], timestampColumn: String): Unit =
+    updateDeepPartitionWithTS(df, this, partitions, timestampColumn)
 
   def deletePartition(partitionKey: String, partitionValue: Any): Unit = deletePartition(this, partitionKey, partitionValue)
 

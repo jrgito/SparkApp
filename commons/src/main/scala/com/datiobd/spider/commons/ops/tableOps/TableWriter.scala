@@ -18,6 +18,14 @@ trait TableWriter extends DFWriter {
     */
   def writeTable(df: DataFrame, table: Table): Unit = {
     writeDF(df, table.path + table.name, table.format, table.writeMode, table.properties, table.partitionColumns)
+  }  /**
+    * write df with table properties
+    *
+    * @param df    {DataFrame}
+    * @param table {Table}
+    */
+  def writeTableWithTS(df: DataFrame, table: Table, timestampColumn:String): Unit = {
+    writeTable(withTS(df, timestampColumn), table)
   }
 
   /**
@@ -29,6 +37,16 @@ trait TableWriter extends DFWriter {
     */
   def writePartition(df: DataFrame, table: Table, partitionKey: String, partitionValue: Any): Unit = {
     writeDF(df, table.path + table.name + createPartition(partitionKey, partitionValue), table.format, table.writeMode, table.properties, Seq())
+  }
+  /**
+    *
+    * @param df             {DataFrame}
+    * @param table          {Table}
+    * @param partitionKey   {String}
+    * @param partitionValue {String}
+    */
+  def writePartitionWithTS(df: DataFrame, table: Table, partitionKey: String, partitionValue: Any, timestampColumn:String): Unit = {
+    writePartition(withTS(df, timestampColumn), table, partitionKey, partitionValue)
   }
 
   /**
@@ -43,6 +61,17 @@ trait TableWriter extends DFWriter {
         PartitionNotFoundErrors.partitionNotFoundError.message.format(table.name, p._2._1))
     })
     writeDF(df, table.path + table.name + createDeepPartition(partitions), table.format, table.writeMode, table.properties, Seq())
+  }
+
+
+  /**
+    *
+    * @param df         {DataFrame}
+    * @param table      {Table}
+    * @param partitions {Seq[(String, Any)]}
+    */
+  def writeDeepPartitionWithTS(df: DataFrame, table: Table, partitions: Seq[(String, Any)], timestampColumn:String): Unit = {
+    writeDeepPartition(withTS(df, timestampColumn), table, partitions)
   }
 
 

@@ -1,9 +1,11 @@
 package com.datiobd.spider.commons.ops
 
-import java.sql.Date
+import java.sql.{Date, Timestamp}
 import java.util.Calendar
 
 import com.datiobd.spider.commons.SparkAppConfig
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.functions._
 
 /**
   * Created by JRGv89 on 19/05/2017.
@@ -67,5 +69,13 @@ protected trait Commons {
     case _: Calendar => SINGLE_QUOTE + new Date(data.asInstanceOf[Calendar].getTimeInMillis) + SINGLE_QUOTE
     case _ => data
   }
+
+  /**
+    * returns a dataFrame with timestamp
+    * @param df {DataFrame}
+    * @param column {Column}
+    * @return dataframe with timestamp column
+    */
+  def withTS(df:DataFrame, column:String) : DataFrame = df.withColumn(column, lit(new Timestamp(Calendar.getInstance().getTimeInMillis)))
 
 }
