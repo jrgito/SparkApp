@@ -9,5 +9,5 @@ class PartitionNotFoundException(code: Int, message: String) extends CodeExcepti
 
 object PartitionNotFoundErrors {
   private val partitionNotFoundCode = 400
-  val partitionNotFoundError = Error(partitionNotFoundCode,s"table %1 has not partition column %2")
+  val partitionNotFoundError = Error(partitionNotFoundCode, s"table %1 has not partition column %2")
 }

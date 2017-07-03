@@ -34,7 +34,7 @@ protected trait Commons {
 
   protected def isDebug: Boolean = SparkAppConfig.debug
 
-  //TODO refact
+  //TODO refact??
 
   /**
     * creates a good partition
@@ -72,10 +72,11 @@ protected trait Commons {
 
   /**
     * returns a dataFrame with timestamp
-    * @param df {DataFrame}
+    *
+    * @param df     {DataFrame}
     * @param column {Column}
     * @return dataframe with timestamp column
     */
-  def withTS(df:DataFrame, column:String) : DataFrame = df.withColumn(column, lit(new Timestamp(Calendar.getInstance().getTimeInMillis)))
+  def withTS(df: DataFrame, column: String): DataFrame = df.withColumn(column, lit(new Timestamp(Calendar.getInstance().getTimeInMillis)))
 
 }

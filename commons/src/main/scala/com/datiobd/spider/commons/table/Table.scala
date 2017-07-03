@@ -1,30 +1,86 @@
 package com.datiobd.spider.commons.table
 
 import com.datiobd.spider.commons.SparkAppConfig
+import com.datiobd.spider.commons.exceptions.{MandatoryKeyNotFound, MandatoryKeyNotFoundErrors}
 import com.datiobd.spider.commons.ops.tableOps.TableOps
+import com.datiobd.spider.commons.utils.Utils
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{DataFrame, SQLContext}
 
 /**
   * Created by JRGv89 on 19/05/2017.
   */
+
+object Table {
+  private val NAME = "name"
+  private val PATH = "path"
+  private val INPUT_PATH = "inputPath"
+  private val OUTPUT_PATH = "outputPath"
+  private val FORMAT = "format"
+  private val READ_ONLY = "readOnly"
+  private val MODE = "mode"
+  private val PKS = "pks"
+  private val PARTITION_COLUMNS = "partitionColumns"
+  private val INCLUDE_PARTITIONS_AS_PK = "includePartitionsAsPk"
+  private val SORT_PKS = "sortPks"
+  private val PRESERVE_SCHEMA = "preserveSchema"
+  private val PROPERTIES = "properties"
+
+  def apply(config: Map[String, Any]): Table = {
+    val (inputPath, outputPath, updatable) = if (config.contains(INPUT_PATH)) {
+      if (!config.contains(OUTPUT_PATH)) {
+        throw new MandatoryKeyNotFound(MandatoryKeyNotFoundErrors.ioPathKeyNotFoundError.code,
+          MandatoryKeyNotFoundErrors.ioPathKeyNotFoundError.message)
+      }
+      val iPath = config(INPUT_PATH).toString
+      val oPath = config(OUTPUT_PATH).toString
+      (iPath, oPath, iPath.equals(oPath))
+    } else {
+      (config(PATH).toString, config(PATH).toString, true)
+    }
+    val partitionsColumns = Utils.toSeq[String](config(PARTITION_COLUMNS))
+    val includePartitions = config.getOrElse(INCLUDE_PARTITIONS_AS_PK, false)
+    val sortPks: Any = config.getOrElse(SORT_PKS, false)
+    val readOnly = config.getOrElse(READ_ONLY, false).toString.toBoolean
+    val preserveSchema = config.getOrElse(PRESERVE_SCHEMA, false).toString.toBoolean
+
+    val pks: Seq[String] = (includePartitions, sortPks) match {
+      case (false, false) => Utils.toSeq[String](config(PKS))
+      case (false, true) => Utils.toSeq[String](config(PKS)).sortBy(pk => pk)
+      case (true, false) => Utils.toSeq[String](config(PKS)) ++ partitionsColumns
+      case (true, true) => (Utils.toSeq[String](config(PKS)) ++ partitionsColumns).sortBy(pk => pk)
+    }
+
+    new Table(config(NAME).toString,
+      inputPath, outputPath,
+      updatable,
+      readOnly,
+      config(FORMAT).toString,
+      config(MODE).toString,
+      pks,
+      partitionsColumns.nonEmpty,
+      partitionsColumns,
+      Some(Utils.toMap[String](config(PROPERTIES))),
+      preserveSchema)
+
+  }
+}
+
+
 class Table(val name: String,
-            val path: String,
+            val inputPath: String,
+            val outputPath: String,
+            val updatable: Boolean = false,
+            val isReadOnly: Boolean = false,
             val format: String,
             val writeMode: String,
             val pks: Seq[String],
             val partitions: Boolean,
             val partitionColumns: Seq[String],
             val properties: Option[Map[String, String]] = None,
+            val preserveSchema: Boolean = true,
             var schema: Option[StructType] = None
            ) extends TableOps {
-
-
-//  def this(config:Map[String,Any]) {
-//
-//    this()
-//  }
-
 
   def read(sqlContext: SQLContext): DataFrame = readTable(sqlContext, this)
 
@@ -69,6 +125,7 @@ class Table(val name: String,
   def deleteDeepPartition(partitions: Seq[(String, Any)]): Unit = deleteDeepPartition(this, partitions)
 
   def debug(sqlContext: SQLContext): Unit = {
+    //TODO loogger??
     if (SparkAppConfig.debug) {
       println("**************")
       println(s"* DEBUG: ${this.name}")

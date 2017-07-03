@@ -18,7 +18,6 @@ private[commons] object SparkAppConfig {
 
   def isDebug: Boolean = debug
 
-  //  config.getConfig(CONFIG_HDFS)
    def parseHDFSConfig(config: Config): Unit = {
 
     if (config.hasPath(ENABLE) && config.getBoolean(ENABLE)) {
@@ -31,6 +30,4 @@ private[commons] object SparkAppConfig {
       hdfsConfig = new Configuration()
     }
   }
-
-
 }

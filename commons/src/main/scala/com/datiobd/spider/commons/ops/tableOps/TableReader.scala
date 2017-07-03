@@ -4,14 +4,14 @@ import com.datiobd.spider.commons.SinfoLogLevel
 import com.datiobd.spider.commons.ops.dfOps.DFReader
 import com.datiobd.spider.commons.exceptions.{PartitionNotFoundErrors, PartitionNotFoundException}
 import com.datiobd.spider.commons.table.Table
+import org.apache.spark.Logging
 import org.apache.spark.sql.{DataFrame, SQLContext}
 
 /**
   * Created by JRGv89 on 19/05/2017.
   */
 
-protected trait TableReader extends DFReader {
-
+protected trait TableReader extends DFReader with Logging {
 
   /**
     * read table with sqlContext
@@ -21,7 +21,7 @@ protected trait TableReader extends DFReader {
     * @return {DataFrame}
     */
   def readTable(sqlContext: SQLContext, table: Table, changeSchema: Boolean = true): DataFrame = {
-    val df = readDF(sqlContext, table.path + table.name, table.format, table.properties)
+    val df = readDF(sqlContext, table.inputPath + table.name, table.format, table.properties)
     if (changeSchema) table.schema = Some(df.schema)
     df
   }
@@ -51,12 +51,13 @@ protected trait TableReader extends DFReader {
       throw new PartitionNotFoundException(PartitionNotFoundErrors.partitionNotFoundError.code,
         PartitionNotFoundErrors.partitionNotFoundError.message.format(table.name, p._2._1))
     })
-    val df = readDF(sqlContext, table.path + table.name, table.format, table.properties, Some(partitions))
+    val df = readDF(sqlContext, table.inputPath + table.name, table.format, table.properties, Some(partitions))
     table.schema = Some(df.schema)
     df
   }
 
   //TODO update this parts below
+  //REFACT
   /**
     * read table with sqlContext and register its with name
     *
@@ -69,8 +70,7 @@ protected trait TableReader extends DFReader {
     val df = readTable(sqlContext, table)
     val _alias = alias.getOrElse(table.name)
     if (alias.isDefined) {
-      //TODO
-//      sLog(SinfoLogLevel.INFO, s"table ${table.name} registered with name ${_alias}")
+      log.info(s"table ${table.name} registered with name ${_alias}")
     }
     df.registerTempTable(_alias)
     df
@@ -99,7 +99,7 @@ protected trait TableReader extends DFReader {
     * @return
     */
   def readAndRegisterDeepPartition(sqlContext: SQLContext, table: Table, partitions: Seq[(String, Any)], alias: Option[String] = None): DataFrame = {
-    val df = readDeepPartition(sqlContext, table,  partitions)
+    val df = readDeepPartition(sqlContext, table, partitions)
     df.registerTempTable(alias.getOrElse(table.name))
     table.schema = Some(df.schema)
     df

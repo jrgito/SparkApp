@@ -8,7 +8,7 @@ class SparkAppTest extends FeatureSpec with GivenWhenThen with Matchers {
   //    override def execute(): Unit = {}
   //  }
 
-  feature("Horizontalization") {
+  feature("spark app") {
 
     scenario("Process") {
 

@@ -43,30 +43,8 @@ class TableBuilder(defaults: Map[String, AnyRef]) {
     }).toMap
   }
 
-  def table(merged: Map[String, Any]): Table = {
-    val partitionsColumns = Utils.toSeq[String](merged(PARTITION_COLUMNS))
-    val includePartitions = merged.getOrElse(INCLUDE_PARTITIONS_AS_PK, false)
-    val sortPks = merged.getOrElse(SORT_PKS, false)
-
-    val pks: Seq[String] = (includePartitions, sortPks) match {
-      case (false, false) => Utils.toSeq[String](merged(PKS))
-      case (false, true) => Utils.toSeq[String](merged(PKS)).sortBy(pk => pk)
-      case (true, false) => Utils.toSeq[String](merged(PKS)) ++ partitionsColumns
-      case (true, true) => (Utils.toSeq[String](merged(PKS)) ++ partitionsColumns).sortBy(pk => pk)
-    }
-
-    new Table(merged(NAME).toString,
-      merged(PATH).toString,
-      merged(FORMAT).toString,
-      merged(MODE).toString,
-      pks,
-      partitionsColumns.nonEmpty,
-      partitionsColumns,
-      Some(Utils.toMap[String](merged(PROPERTIES))))
-  }
-
   def table(t: Map[String, Any], defaults: Map[String, Any]): Table = {
-    table(defaults ++ t)
+    Table.apply(defaults ++ t)
   }
 
 }

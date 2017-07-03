@@ -10,5 +10,7 @@ class MandatoryKeyNotFound(code: Int, message: String) extends CodeException(cod
 
 object MandatoryKeyNotFoundErrors {
   private val mandatoryKeyNotFoundCode = 600
+  private val ioPathKeyNotFoundCode = 601
   val mandatoryKeyNotFoundError = Error(mandatoryKeyNotFoundCode, s"key %s not found in default table config")
+  val ioPathKeyNotFoundError = Error(ioPathKeyNotFoundCode, s"input and output path both must exist")
 }
