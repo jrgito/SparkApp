@@ -4,7 +4,7 @@ import com.jrgv89.sparkApp.Loggeator
 import com.jrgv89.sparkApp.exceptions.{PartitionNotFoundErrors, PartitionNotFoundException}
 import com.jrgv89.sparkApp.ops.dfOps.DFReader
 import com.jrgv89.sparkApp.table.Table
-import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 /**
   * Created by JRGv89 on 19/05/2017.
@@ -13,60 +13,60 @@ import org.apache.spark.sql.{DataFrame, SQLContext}
 protected trait TableReader extends DFReader with Loggeator {
 
   /**
-    * read table with sqlContext
+    * read table with spark
     *
-    * @param sqlContext {SQLContext}
-    * @param table      {Table}
+    * @param spark {SparkSession}
+    * @param table {Table}
     * @return {DataFrame}
     */
-  def readTable(sqlContext: SQLContext, table: Table, changeSchema: Boolean = true): DataFrame = {
-    val df = readDF(sqlContext, table.inputPath + table.name, table.format, table.properties)
+  protected def readTable(spark: SparkSession, table: Table, changeSchema: Boolean = true): DataFrame = {
+    val df = readDF(spark, table.inputPath + table.name, table.format, table.properties)
     if (changeSchema) table.schema = Some(df.schema)
     df
   }
 
   /**
-    * read partition with sqlContext
+    * read partition with spark
     *
-    * @param sqlContext     {SQLContext}
+    * @param spark          {SparkSession}
     * @param table          {Table}
     * @param partitionKey   {String}
     * @param partitionValue {String}
     * @return {DataFrame}
     */
-  def readPartition(sqlContext: SQLContext, table: Table, partitionKey: String, partitionValue: Any): DataFrame = {
-    readDeepPartition(sqlContext, table, Seq((partitionKey, partitionValue)))
+  protected def readPartition(spark: SparkSession, table: Table, partitionKey: String, partitionValue: Any): DataFrame = {
+    readDeepPartition(spark, table, Seq((partitionKey, partitionValue)))
   }
 
   /**
+    * read deep partition with spark
     *
-    * @param sqlContext {SQLContext}
+    * @param spark      {SparkSession}
     * @param table      {Table}
     * @param partitions {Seq[(String, Any)]}
     * @return
     */
-  def readDeepPartition(sqlContext: SQLContext, table: Table, partitions: Seq[(String, Any)]): DataFrame = {
+  protected def readDeepPartition(spark: SparkSession, table: Table, partitions: Seq[(String, Any)]): DataFrame = {
     table.partitionColumns.zip(partitions).foreach(p => if (!p._1.equals(p._2._1)) {
       throw new PartitionNotFoundException(PartitionNotFoundErrors.partitionNotFoundError.code,
         PartitionNotFoundErrors.partitionNotFoundError.message.format(table.name, p._2._1))
     })
-    val df = readDF(sqlContext, table.inputPath + table.name, table.format, table.properties, Some(partitions))
+    val df = readDF(spark, table.inputPath + table.name, table.format, table.properties, Some(partitions))
     table.schema = Some(df.schema)
     df
   }
 
-  //TODO update this parts below
-  //REFACT
+  //TODO review and update this parts below
   /**
-    * read table with sqlContext and register its with name
+    * read table with spark and register its with name
     *
-    * @param sqlContext {SQLContext}
-    * @param table      {Table}
-    * @param alias      {Option[String]}
+    * @param spark {SparkSession}
+    * @param table {Table}
+    * @param alias {Option[String]}
     * @return {DataFrame}
     */
-  def readAndRegisterTable(sqlContext: SQLContext, table: Table, alias: Option[String] = None): DataFrame = {
-    val df = readTable(sqlContext, table)
+  protected def readAndRegisterTable(spark: SparkSession, table: Table, alias: Option[String] = None): DataFrame = {
+    val df = readTable(spark, table)
     val _alias = alias.getOrElse(table.name)
     if (alias.isDefined) {
       loggeator.info(s"table ${table.name} registered with name ${_alias}")
@@ -76,29 +76,31 @@ protected trait TableReader extends DFReader with Loggeator {
   }
 
   /**
-    * read table with sqlContext and register its with name
+    * read table with spark and register its with name
     *
-    * @param sqlContext     {SQLContext}
+    * @param spark          {SparkSession}
     * @param table          {Table}
     * @param partitionKey   {String}
     * @param partitionValue {String}
     * @param alias          {String}
     * @return {DataFrame}
     */
-  def readAndRegisterPartition(sqlContext: SQLContext, table: Table, partitionKey: String, partitionValue: Any, alias: Option[String] = None): DataFrame = {
-    readAndRegisterDeepPartition(sqlContext, table, Seq((partitionKey, partitionValue)), alias)
+  protected def readAndRegisterPartition(spark: SparkSession, table: Table, partitionKey: String, partitionValue: Any,
+                                         alias: Option[String] = None): DataFrame = {
+    readAndRegisterDeepPartition(spark, table, Seq((partitionKey, partitionValue)), alias)
   }
 
   /**
     *
-    * @param sqlContext {SQLContext}
+    * @param spark      {SparkSession}
     * @param table      {Table}
     * @param partitions {Seq[(String, Any)]}
     * @param alias      {String}
     * @return
     */
-  def readAndRegisterDeepPartition(sqlContext: SQLContext, table: Table, partitions: Seq[(String, Any)], alias: Option[String] = None): DataFrame = {
-    val df = readDeepPartition(sqlContext, table, partitions)
+  protected def readAndRegisterDeepPartition(spark: SparkSession, table: Table, partitions: Seq[(String, Any)],
+                                             alias: Option[String] = None): DataFrame = {
+    val df = readDeepPartition(spark, table, partitions)
     df.registerTempTable(alias.getOrElse(table.name))
     table.schema = Some(df.schema)
     df

@@ -1,5 +1,6 @@
 package com.jrgv89.sparkApp
 
+import com.jrgv89.sparkApp.exceptions.{MandatoryKeyNotFound, MandatoryKeyNotFoundErrors}
 import com.typesafe.config.Config
 import org.apache.hadoop.conf.Configuration
 
@@ -8,22 +9,44 @@ import scala.collection.JavaConverters._
 /**
   * Created by JRGv89 on 20/05/2017.
   */
-private[sparkApp] class SparkAppConfig(val isDebug: Boolean) extends Constants {
-
-  var isHdfsEnable = false
-  var hdfsConfig: Configuration = new Configuration()
+private[sparkApp] class SparkAppConfig(options : Config) extends Constants {
 
 
-  private[sparkApp] def parseHDFSConfig(sparkAppConfig: Config): Unit = {
 
-    if (sparkAppConfig.hasPath(HDFS_ENABLE_PATH) && sparkAppConfig.getBoolean(HDFS_ENABLE_PATH)) {
-      val _hdfsConfig = new Configuration()
-      sparkAppConfig.getObject(HDFS_PROPERTIES_PATH).unwrapped.asScala.toMap.asInstanceOf[Map[String, String]].foreach(p => _hdfsConfig.set(p._1, p._2))
-      isHdfsEnable = true
-      hdfsConfig = _hdfsConfig
-    } else {
-      isHdfsEnable = false
-      hdfsConfig = new Configuration()
+  var isDebug: Boolean = false
+  var isHdfsEnabled = false
+  var isLoggerEnabled = true
+  var hdfsConfiguration: Configuration = new Configuration()
+
+
+  if(options.hasPath("hdfs")) parseHDFSConfig(options.getConfig("hdfs"))
+  if(options.hasPath("debug")) parseDebugConfig(options.getConfig("debug"))
+  if(options.hasPath("logger")) parseLoggerConfig(options.getConfig("logger"))
+
+
+  private def parseLoggerConfig(loggerConfig: Config): Unit = {
+    //TODO
+    if(!loggerConfig.hasPath(ENABLE)) throw new MandatoryKeyNotFound(MandatoryKeyNotFoundErrors.mandatoryKeyNotFoundError.code,
+      MandatoryKeyNotFoundErrors.mandatoryKeyNotFoundError.message.format(ENABLE, "options.logger.enable"))
+    isLoggerEnabled = loggerConfig.getBoolean(ENABLE)
+  }
+
+  private def parseDebugConfig(debugConfig: Config): Unit ={
+    if(!debugConfig.hasPath(ENABLE)) throw new MandatoryKeyNotFound(MandatoryKeyNotFoundErrors.mandatoryKeyNotFoundError.code,
+      MandatoryKeyNotFoundErrors.mandatoryKeyNotFoundError.message.format(ENABLE, "options.debug.enable"))
+    isDebug = debugConfig.getBoolean(ENABLE)
+  }
+
+  private def parseHDFSConfig(hdfsConfig: Config): Unit = {
+
+    if(!hdfsConfig.hasPath(ENABLE)) throw new MandatoryKeyNotFound(MandatoryKeyNotFoundErrors.mandatoryKeyNotFoundError.code,
+      MandatoryKeyNotFoundErrors.mandatoryKeyNotFoundError.message.format(ENABLE, "options.hdfs.enable"))
+
+    isHdfsEnabled = hdfsConfig.getBoolean(ENABLE)
+    if(isHdfsEnabled) {
+      if(!hdfsConfig.hasPath(PROPERTIES)) throw new MandatoryKeyNotFound(MandatoryKeyNotFoundErrors.mandatoryKeyNotFoundError.code,
+        MandatoryKeyNotFoundErrors.mandatoryKeyNotFoundError.message.format(PROPERTIES, "options.hdfs.properties"))
+      hdfsConfig.getObject(PROPERTIES).unwrapped.asScala.toMap.asInstanceOf[Map[String, String]].foreach(p => hdfsConfiguration.set(p._1, p._2))
     }
   }
 }
@@ -33,8 +56,8 @@ private[sparkApp] object SparkAppConfig {
 
   def instance: SparkAppConfig = builder.get
 
-  private[sparkApp] def create(debug: Boolean): SparkAppConfig = {
-    if (builder.isEmpty) builder = Some(new SparkAppConfig(debug))
+  private[sparkApp] def create(options: Config): SparkAppConfig = {
+    if (builder.isEmpty) builder = Some(new SparkAppConfig(options))
     builder.get
   }
 }

@@ -34,7 +34,7 @@ class TableBuilder(defaults: Map[String, AnyRef]) extends Loggeator{
   private def checkDefaults(): Unit = {
     keys.foreach(key => {
       if (!defaults.contains(key)) throw new MandatoryKeyNotFound(MandatoryKeyNotFoundErrors.mandatoryKeyNotFoundError.code,
-        MandatoryKeyNotFoundErrors.mandatoryKeyNotFoundError.message.format(key))
+        MandatoryKeyNotFoundErrors.mandatoryKeyNotFoundError.message.format(key, "defaultTable"))
     })
   }
 

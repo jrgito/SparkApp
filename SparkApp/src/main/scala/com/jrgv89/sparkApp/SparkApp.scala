@@ -24,36 +24,33 @@ abstract class SparkApp(conf: Config) extends Constants with DFOps with Loggeato
 
   def execute(spark: SparkSession): Int
 
-
   private val sparkAppConfig: Config = conf.getConfig(SPARK_APP)
 
   TableBuilder.create(sparkAppConfig.getConfig(DEFAULT_TABLE_PATH))
 
-
   private val name = sparkAppConfig.getString(SPARK_JOB_NAME_PATH)
   private val scMap = sparkAppConfig.getObject(SPARK_JOB_CONFIG_PATH).unwrapped.asScala.toMap.asInstanceOf[Map[String, String]]
-  private val options = sparkAppConfig.getObject(OPTIONS_PATH).unwrapped.asScala.toMap.asInstanceOf[Map[String, String]]
-  protected val debug: Boolean = options.getOrElse(DEBUG, false).toString.toBoolean
+  //  private val options = sparkAppConfig.getObject(OPTIONS_PATH).unwrapped.asScala.toMap.asInstanceOf[Map[String, String]]
 
-  SparkAppConfig.create(debug)
-  SparkAppConfig.instance.parseHDFSConfig(sparkAppConfig)
+  SparkAppConfig.create(sparkAppConfig.getConfig(OPTIONS_PATH))
 
-  val tables: Map[String, Table] = TableBuilder.instance.tables(sparkAppConfig.getConfigList(TABLES_PATH).asScala)
+  protected val tables: Map[String, Table] = TableBuilder.instance.tables(sparkAppConfig.getConfigList(TABLES_PATH).asScala)
 
+  protected val appConfig: Config = sparkAppConfig.getConfig("app")
 
   /** **
     * Spark config
     * ***/
 
   private val sConf = new SparkConf().setAppName(name).setAll(scMap)
-  lazy val spark: SparkSession = SparkSession.builder().config(sConf).getOrCreate()
+  protected lazy val spark: SparkSession = SparkSession.builder().config(sConf).getOrCreate()
 
   /**
     * method that start the process
     */
 
   def start(): Unit = {
-    if (debug) {
+    if (SparkAppConfig.instance.isDebug) {
       val (time, result) = Utils.time(execute(spark))
       println(s"time lapsed: " + time + " s")
       spark.stop

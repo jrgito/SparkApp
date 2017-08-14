@@ -12,7 +12,7 @@ import scala.collection.Map
 trait DFWriter extends Commons {
 
   /**
-    * writeDF
+    * writes df in path with specific format
     *
     * @param df     {DataFrame}
     * @param path   {String}
@@ -24,7 +24,7 @@ trait DFWriter extends Commons {
   }
 
   /**
-    * writeDF
+    * writes df in path with specific format and properties
     *
     * @param df      {DataFrame}
     * @param path    {String}
@@ -37,6 +37,7 @@ trait DFWriter extends Commons {
   }
 
   /**
+    * writes df partitioned in path with specific format
     *
     * @param df               {DataFrame}
     * @param path             {String}
@@ -50,7 +51,7 @@ trait DFWriter extends Commons {
 
 
   /**
-    * write df with options
+    * writes df in path with specific format and properties
     *
     * @param df               {DataFrame}
     * @param path             {String}

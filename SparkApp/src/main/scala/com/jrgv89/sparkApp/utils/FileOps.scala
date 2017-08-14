@@ -9,9 +9,9 @@ import org.apache.hadoop.fs.{FileSystem, Path}
 
 object FileOps {
 
-  def getHDFSConfig: Configuration = SparkAppConfig.instance.hdfsConfig
+  def getHDFSConfig: Configuration = SparkAppConfig.instance.hdfsConfiguration
 
-  def isHDFSEnable: Boolean = SparkAppConfig.instance.isHdfsEnable
+  def isHDFSEnable: Boolean = SparkAppConfig.instance.isHdfsEnabled
 
   def deleteDirectory(path: String): Unit = {
     if (isHDFSEnable) {

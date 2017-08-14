@@ -9,8 +9,8 @@ import com.jrgv89.sparkApp.errors.Error
 class MandatoryKeyNotFound(code: Int, message: String) extends CodeException(code, message)
 
 object MandatoryKeyNotFoundErrors {
-  private val mandatoryKeyNotFoundCode = 600
-  private val ioPathKeyNotFoundCode = 601
-  val mandatoryKeyNotFoundError = Error(mandatoryKeyNotFoundCode, s"key %s not found in default table config")
+  private val mandatoryKeyNotFoundCode = 601
+  private val ioPathKeyNotFoundCode = 602
+  val mandatoryKeyNotFoundError = Error(mandatoryKeyNotFoundCode, s"key %s not found in %s config")
   val ioPathKeyNotFoundError = Error(ioPathKeyNotFoundCode, s"input and output path both must exist")
 }

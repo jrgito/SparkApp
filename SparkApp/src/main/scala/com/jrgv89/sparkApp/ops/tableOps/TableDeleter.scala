@@ -13,7 +13,7 @@ protected trait TableDeleter extends DFDeleter {
     *
     * @param table {Table} table to delete
     */
-  def deleteTable(table: Table): Unit = {
+  protected  def deleteTable(table: Table): Unit = {
     deleteDF(table.inputPath + table.name)
   }
 
@@ -25,7 +25,7 @@ protected trait TableDeleter extends DFDeleter {
     * @param partitionKey   {String} partition key
     * @param partitionValue {String} partition value
     */
-  def deletePartition(table: Table, partitionKey: String, partitionValue: Any): Unit = {
+  protected def deletePartition(table: Table, partitionKey: String, partitionValue: Any): Unit = {
     deleteDeepPartition(table, Seq((partitionKey, partitionValue)))
   }
 
@@ -35,7 +35,7 @@ protected trait TableDeleter extends DFDeleter {
     * @param table      {Table} table
     * @param partitions {Seq[String, Any]} partitions of table to delete
     */
-  def deleteDeepPartition(table: Table, partitions: Seq[(String, Any)]): Unit = {
+  protected def deleteDeepPartition(table: Table, partitions: Seq[(String, Any)]): Unit = {
     deleteDF(table.inputPath + table.name + createDeepPartition(partitions))
   }
 }

@@ -5,7 +5,7 @@ import com.jrgv89.sparkApp.exceptions.{MandatoryKeyNotFound, MandatoryKeyNotFoun
 import com.jrgv89.sparkApp.ops.tableOps.TableOps
 import com.jrgv89.sparkApp.utils.Utils
 import org.apache.spark.sql.types.StructType
-import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 /**
   * Created by JRGv89 on 19/05/2017.
@@ -66,7 +66,6 @@ object Table {
   }
 }
 
-
 class Table(val name: String,
             val inputPath: String,
             val outputPath: String,
@@ -82,7 +81,7 @@ class Table(val name: String,
             var schema: Option[StructType] = None
            ) extends TableOps {
 
-  def read(sqlContext: SQLContext): DataFrame = readTable(sqlContext, this)
+  def read(spark: SparkSession): DataFrame = readTable(spark, this)
 
   def write(df: DataFrame): Unit = writeTable(df, this)
 
@@ -94,11 +93,11 @@ class Table(val name: String,
 
   def delete(): Unit = deleteTable(this)
 
-  def readPartition(sqlContext: SQLContext, partitionKey: String, partitionValue: Any): DataFrame =
-    readPartition(sqlContext, this, partitionKey: String, partitionValue: Any)
+  def readPartition(spark: SparkSession, partitionKey: String, partitionValue: Any): DataFrame =
+    readPartition(spark, this, partitionKey: String, partitionValue: Any)
 
-  def readDeepPartition(sqlContext: SQLContext, partitions: Seq[(String, Any)]): DataFrame =
-    readDeepPartition(sqlContext, this, partitions)
+  def readDeepPartition(spark: SparkSession, partitions: Seq[(String, Any)]): DataFrame =
+    readDeepPartition(spark, this, partitions)
 
   def writePartition(df: DataFrame, partitionKey: String, partitionValue: Any): Unit = writePartition(df, this, partitionKey, partitionValue)
 
@@ -124,13 +123,13 @@ class Table(val name: String,
 
   def deleteDeepPartition(partitions: Seq[(String, Any)]): Unit = deleteDeepPartition(this, partitions)
 
-  def debug(sqlContext: SQLContext): Unit = {
+  def debug(spark: SparkSession): Unit = {
     //TODO loogger??
     if (SparkAppConfig.instance.isDebug) {
       println("**************")
       println(s"* DEBUG: ${this.name}")
       println("**************")
-      readTable(sqlContext, this, changeSchema = false).show
+      readTable(spark, this, changeSchema = false).show
     }
   }
 

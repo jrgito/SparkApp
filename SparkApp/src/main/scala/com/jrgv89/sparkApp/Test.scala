@@ -6,8 +6,11 @@ import org.apache.spark.sql.SparkSession
   * Created by JRGv89 on 20/05/2017.
   */
 class Test(path: String) extends SparkApp(path) {
-  override def execute(spark: SparkSession): Int = {println("test")
-  1}
+  override def execute(spark: SparkSession): Int = {
+    println("test")
+    tables("").read(spark)
+    1
+  }
 
   override def clazz: Class[_] = this.getClass
 
@@ -15,6 +18,6 @@ class Test(path: String) extends SparkApp(path) {
 }
 
 object Test extends App {
-  new Test("commons/src/main/resources/horizontalization/horizontalization.conf").start()
+  new Test("SparkApp/src/main/resources/dummy.conf").start()
 
 }

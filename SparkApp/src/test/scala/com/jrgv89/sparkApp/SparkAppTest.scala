@@ -4,9 +4,6 @@ import org.scalatest.{FeatureSpec, GivenWhenThen, Matchers}
 
 class SparkAppTest extends FeatureSpec with GivenWhenThen with Matchers {
 
-  //  class _SinfoAppMock(configFile: String) extends SparkApp(configFile) {
-  //    override def execute(): Unit = {}
-  //  }
 
   feature("spark app") {
 

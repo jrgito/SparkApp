@@ -36,8 +36,7 @@ object Utils {
     *
     * @param f {T} method to measure
     * @tparam T {T} generic
-    * @return {Double} time lapsed in execute f
-    * @return {Any} result of f
+    * @return {(Double, Any)} time lapsed in execute f and result
     */
   def time[T](f: => T): (Double, Any) = {
     val start = System.nanoTime

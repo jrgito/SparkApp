@@ -1,6 +1,6 @@
 package com.jrgv89.sparkApp
 
-trait Constants {
+private[sparkApp] trait Constants {
   val NAMENODE: String = "namenode"
   val PKS = "pks"
   val PATH = "path"
@@ -37,6 +37,7 @@ trait Constants {
   val HDFS_PATH = "config.hdfs"
   val HDFS_ENABLE_PATH = "config.hdfs.enable"
   val HDFS_PROPERTIES_PATH = "config.hdfs.properties"
+  val DEBUG_PATH = "config.debug"
 
 
 }

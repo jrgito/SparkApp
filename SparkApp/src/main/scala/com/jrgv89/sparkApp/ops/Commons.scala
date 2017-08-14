@@ -43,7 +43,7 @@ protected trait Commons {
     * @param data {String} partition value
     * @return
     */
-  def createPartition(key: String, data: Any): String = data match {
+  protected def createPartition(key: String, data: Any): String = data match {
     case _: java.sql.Date => partitionPath.format(key, data)
     case _: java.util.Date => partitionPath.format(key, new Date(data.asInstanceOf[java.util.Date].getTime))
     case _: Calendar => partitionPath.format(key, new Date(data.asInstanceOf[Calendar].getTimeInMillis))
@@ -55,7 +55,7 @@ protected trait Commons {
     * @param partitions {Seq[(String, Any)]}
     * @return
     */
-  def createDeepPartition(partitions: Seq[(String, Any)]): String = partitions.map(p => createPartition(p._1, p._2)).mkString
+  protected def createDeepPartition(partitions: Seq[(String, Any)]): String = partitions.map(p => createPartition(p._1, p._2)).mkString
 
   /**
     * transform data for where clause
@@ -63,7 +63,7 @@ protected trait Commons {
     * @param data {Any} any value
     * @return {Any}
     */
-  def transformPartitionValue(data: Any): Any = data match {
+  protected def transformPartitionValue(data: Any): Any = data match {
     case _: java.sql.Date => SINGLE_QUOTE + data + SINGLE_QUOTE
     case _: java.util.Date => SINGLE_QUOTE + new Date(data.asInstanceOf[java.util.Date].getTime) + SINGLE_QUOTE
     case _: Calendar => SINGLE_QUOTE + new Date(data.asInstanceOf[Calendar].getTimeInMillis) + SINGLE_QUOTE
@@ -77,6 +77,6 @@ protected trait Commons {
     * @param column {Column}
     * @return dataframe with timestamp column
     */
-  def withTS(df: DataFrame, column: String): DataFrame = df.withColumn(column, lit(new Timestamp(Calendar.getInstance().getTimeInMillis)))
+  protected def withTS(df: DataFrame, column: String): DataFrame = df.withColumn(column, lit(new Timestamp(Calendar.getInstance().getTimeInMillis)))
 
 }
