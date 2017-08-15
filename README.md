@@ -117,7 +117,6 @@ class Test(path: String) extends SparkApp(path) {
 object Test extends App {
     new Test("path/to/config/dummy.conf").start()
 }
-
 ```
 
 #### With dfOps
@@ -147,7 +146,6 @@ override def execute(spark: SparkSession): Int = {
 override def execute(spark: SparkSession): Int = {
     tables("tableName").write(df)
 }
-
 ```
 
 * Update a table
@@ -156,8 +154,10 @@ override def execute(spark: SparkSession): Int = {
 override def execute(spark: SparkSession): Int = {
     tables("tableName").update(df)
 }
-
 ```
+
+
+**NOTE**: _updatePartition_ in which data change partition value should be update with **_update_** instead of _updatePartition_
 
 #### DFOps
 
@@ -168,7 +168,6 @@ class Test extends DFOps {
     val spark = SparkSession   ...
     val df = readDF(spark, "path", "csv")
 }
-
 ```
 
 * Write a table
@@ -178,7 +177,6 @@ class Test extends DFOps {
     val spark = SparkSession   ...
     writeDF(df,"path", "parquet", "overwrite")
 }
-
 ```
 
 * Update a table
@@ -188,7 +186,6 @@ class Test extends DFOps {
     val spark = SparkSession   ...
     updateDF(df, "path", "avro")
 }
-
 ```
 
 ## API - Reference

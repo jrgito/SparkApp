@@ -14,8 +14,8 @@ private[sparkApp] class SparkAppConfig(options : Config) extends Constants {
 
 
   var isDebug: Boolean = false
-  var isHdfsEnabled = false
-  var isLoggerEnabled = true
+  var isHdfsEnabled: Boolean = true
+  var isLoggerEnabled: Boolean = true
   var hdfsConfiguration: Configuration = new Configuration()
 
 

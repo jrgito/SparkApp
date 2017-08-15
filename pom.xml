@@ -15,6 +15,7 @@
     </licenses>
     <modules>
         <module>SparkApp</module>
+        <module>Examples</module>
     </modules>
 
     <properties>

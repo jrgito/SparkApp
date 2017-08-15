@@ -1,6 +1,5 @@
 target/
 .idea/
-.idea/*
 *.iml
 *.log
 *.log.?
@@ -10,7 +9,6 @@ target/
 .classpath
 .settings/
 .cache-*
-assets
 dependency-reduced-pom.xml
 out
 logs

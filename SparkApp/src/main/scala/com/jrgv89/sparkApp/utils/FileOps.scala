@@ -7,7 +7,7 @@ import org.apache.commons.io.FileUtils
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
 
-object FileOps {
+trait FileOps {
 
   def getHDFSConfig: Configuration = SparkAppConfig.instance.hdfsConfiguration
 
@@ -34,6 +34,11 @@ object FileOps {
     fs.rename(new Path(source), new Path(dest))
   }
 
+  /**
+    * move local directory simulating spark update
+    * @param source {String} source file path
+    * @param dest   {String} dest file
+    */
   def moveLocalDirectory(source: String, dest: String): Unit = {
     FileUtils.deleteDirectory(new File(dest))
     new File(source).renameTo(new File(dest))

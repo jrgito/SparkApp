@@ -6,7 +6,7 @@ import org.apache.spark.sql.DataFrame
 /**
   * Created by JRGv89 on 19/05/2017.
   */
-trait DFUpdater extends DFWriter {
+trait DFUpdater extends DFWriter with FileOps{
 
   private val saveMode = "overwrite"
 
@@ -19,7 +19,7 @@ trait DFUpdater extends DFWriter {
     */
   def updateDF(df: DataFrame, path: String, format: String): Unit = {
     writeDF(df, path + TEMP_DIR_PATH, format, saveMode, None, Seq())
-    FileOps.moveDirectory(path + TEMP_DIR_PATH, path)
+    moveDirectory(path + TEMP_DIR_PATH, path)
   }
 
   /**
@@ -32,7 +32,7 @@ trait DFUpdater extends DFWriter {
     */
   def updateDF(df: DataFrame, path: String, format: String, properties: Option[Map[String, String]]): Unit = {
     writeDF(df, path + TEMP_DIR_PATH, format, saveMode, properties, Seq())
-    FileOps.moveDirectory(path + TEMP_DIR_PATH, path)
+    moveDirectory(path + TEMP_DIR_PATH, path)
   }
 
   /**
@@ -46,6 +46,6 @@ trait DFUpdater extends DFWriter {
     */
   def updateDF(df: DataFrame, path: String, format: String, properties: Option[Map[String, String]], partitions: Seq[String]): Unit = {
     writeDF(df, path + TEMP_DIR_PATH, format, saveMode, properties, partitions)
-    FileOps.moveDirectory(path + TEMP_DIR_PATH, path)
+    moveDirectory(path + TEMP_DIR_PATH, path)
   }
 }
