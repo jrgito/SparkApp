@@ -16,6 +16,7 @@
     <modules>
         <module>SparkApp</module>
         <module>Examples</module>
+        <module>IODataframe</module>
     </modules>
 
     <properties>
